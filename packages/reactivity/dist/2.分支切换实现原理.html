@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="./reactivity.global.js"></script>
+    <!-- <script src="../../../node_modules/@vue/reactivity/dist/reactivity.global.js"></script> -->
+    <script>
+      // effect代表的是副作用函数 如果此函数依赖的数据发生变化了 会重新执行
+      // reactive将数据变成响应式 proxy
+      const { effect, reactive } = VueReactivity;
+      const state = reactive({ flag: true, name: 'jw', age: 30 });
+      effect(() => {
+        // 副作用函数 (effect执行渲染了页面)
+        console.log('render');
+        document.body.innerHTML = state.flag ? state.name : state.age;
+      });
+      setTimeout(() => {
+        state.flag = false;
+        setTimeout(() => {
+          console.log('修改name，原则上不更新');
+          state.name = 'zf';
+        }, 1000);
+      }, 1000);
+    </script>
+  </body>
+</html>

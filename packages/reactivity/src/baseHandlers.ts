@@ -1,0 +1,34 @@
+import { isObject } from '@vue/shared';
+import { reactive } from './reactive';
+import { activeEffect, track, trigger } from './effect';
+
+export const enum ReactiveFlags {
+  IS_REACTIVE = '_v_isReactive',
+}
+
+export const mutableHandlers = {
+  get(target, key, receiver) {
+    if (key === ReactiveFlags.IS_REACTIVE) {
+      return true;
+    }
+    track(target, 'get', key);
+    // 去代理对象上取值 就走get (这里可以监控到用户取值了)
+    let res = Reflect.get(target, key, receiver);
+
+    if (isObject(res)) {
+      return reactive(res); // 深度代理实现 性能好 取值就可以进行代理
+    }
+
+    return res;
+  },
+  set(target, key, value, receiver) {
+    let oldValue = target[key];
+    let result = Reflect.set(target, key, value, receiver);
+    if (oldValue !== value) {
+      // 值变化了 要更新
+      trigger(target, 'set', key, value, oldValue);
+    }
+    // 去代理商设置值 执行set (这里可以监控到用户设置值了)
+    return result;
+  },
+};

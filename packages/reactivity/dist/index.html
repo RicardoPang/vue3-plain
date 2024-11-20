@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="./reactivity.global.js"></script>
+    <!-- <script src="../../../node_modules/vue/dist/vue.global.js"></script> -->
+    <script>
+      const { reactive, effect, ref, toRefs, toRef, proxyRefs } = VueReactivity;
+      // const { reactive, ref, effect, toRef, toRefs, proxyRefs } = Vue; // reactive它支持一个对象类型
+
+      // const flag = ref(false);
+      // effect(() => {
+      //   app.innerHTML = flag.value ? '你好' : '不好';
+      // });
+      // setTimeout(() => {
+      //   flag.value = true;
+      // }, 1000);
+
+      const school = reactive({ name: 'pf', age: 13 });
+      let { age } = proxyRefs(school);
+      let name = toRef(school, 'name');
+      effect(() => {
+        app.innerHTML = `${name.value}今年${age}岁了`;
+      });
+      // 后续其实我们取值都是在模板中取值的 在模板里取值的时候都会自动去掉ref
+      // 我们在使用数据的时候 都是把响应式的数据 toRefs 在模板里用的时候不需要加.value
+      setTimeout(() => {
+        age = 100;
+        name.value = 'ricardo';
+      }, 1000);
+    </script>
+  </body>
+</html>
